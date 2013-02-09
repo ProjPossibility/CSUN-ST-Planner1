@@ -24,6 +24,7 @@ and save them as 'client_secrets.json' in the project directory.
 """
 
 import httplib2
+import json
 import logging
 import os
 import pickle
@@ -32,6 +33,7 @@ from apiclient.discovery import build
 from oauth2client.appengine import oauth2decorator_from_clientsecrets
 from oauth2client.client import AccessTokenRefreshError
 from google.appengine.api import memcache
+from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
@@ -80,36 +82,16 @@ class MainHandler(webapp.RequestHandler):
 
   @decorator.oauth_required
   def get(self):
-    self.response.out.write("""<html><body>
-
-  <p>Congratulations, you are up and running! At this point you will want to add
-  calls into the Calendar API to the <code>main.py</code> file. Please read the
-  <code>main.py</code> file carefully, it contains detailed information in
-  the comments.  For more information on the Calendar API Python library
-  surface you can visit: </p>
-
- <blockquote>
-   <p>
-   <a href="https://google-api-client-libraries.appspot.com/documentation/calendar/v3/python/latest/">
-   https://google-api-client-libraries.appspot.com/documentation/calendar/v3/python/latest/
-   </a>
-   </p>
- </blockquote>
-
-  <p>
-  Also check out the <a
-    href="https://developers.google.com/api-client-library/python/start/get_started">
-    Python Client Library documentation</a>, and get more information on the
-  Calendar API at:
-  </p>
-
-  <blockquote>
-    <p>
-    <a href="https://developers.google.com/google-apps/calendar/firstapp">https://developers.google.com/google-apps/calendar/firstapp</a>
-    </p>
-  </blockquote>
-""")
-
+    # Get the authorized Http object created by the decorator.
+    http = decorator.http()
+    # Call the service using the authorized Http object.
+    request = service.events().list(calendarId='primary')
+    response = request.execute(http=http)
+    
+    self.response.out.write("<html><p>" + json.dumps(response, sort_keys=True, 
+                                                     indent=4) + "</p></html")
+    
+        
 def main():
   application = webapp.WSGIApplication(
       [
