@@ -149,19 +149,21 @@ class TeacherHandler(webapp.RequestHandler):
         
         user.put()
         
-        template_values = {}
-        
+        template_values = {'first': user.first_name, 
+                           'last': user.last_name, 
+                           'calendars': user.calendars}
+
         path = os.path.join(os.path.dirname(__file__), 'teacher.html')
         self.response.out.write(template.render(path, template_values))
         
 class EventHandler(webapp.RequestHandler):
     
-    def get(self):
+    def post(self):
         self.response.out.write("<html><p>Hello World!</p></html>")
         
 class CreateCalHandler(webapp.RequestHandler):
     
-    def get(self):
+    def post(self):
         self.response.out.write("<html><p>Hello World!</p></html>")
 
 def main():
