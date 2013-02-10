@@ -95,11 +95,11 @@ class MainHandler(webapp.RequestHandler):
     user.first = "Stuff"
     user.last = "Thing"
     user.email = "thisisanemail@whatever.com"
-    user.courses = {"Test Course" : "primary"}
+    user.calendars = ["test text for now"]
     
     template_values = {'first': user.first, 
                        'last': user.last, 
-                       'courses': user.courses}
+                       'calendars': user.calendars}
     
     path = os.path.join(os.path.dirname(__file__), 'student.html')
     self.response.out.write(template.render(path, template_values))
