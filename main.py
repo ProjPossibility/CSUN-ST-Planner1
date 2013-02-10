@@ -143,40 +143,7 @@ class Teacher(db.Model, webapp.RequestHandler):
         self.last_name = db.StringProperty()
         self.email = db.StringProperty()
         self.calendars = db.StringListProperty()
-    
-    """@decorator.oauth_required
-    def createCalendar(self, student):
-        http = decorator.http()
-        
-        # description = student.first_name + "Study Planner"
-        calendar = {
-                    "kind": "calendar#calendar",
-                    "summary": 'student',
-                    "description": "student planner",
-                    "location": "Los Angeles",
-                    "timeZone": 'America/Los_Angeles'
-                    }
-    
-        created_calendar = service.calendars().insert(body=calendar).execute(http=http)
-        student.courses.append[created_calender['id']]
-        rule = {
-                "kind": "calendar#aclRule",
-              
-                "id": created_calendar['id'],
-                    "scope": {
-                              "type": "user",
-                              "value": student.email
-                              },
-                "role": reader
-                }
-        # print "hello"
-        created_rule = service.acl().insert(calendarId=created_calendar['id'], body=rule).execute(http=http)
-        # with open("log", "w") as f:
-        #    f.write(created_rule)
-        #    f.close()
-            
-        # return " <h2> we did it</h2>"        
-        """
+
 class TeacherHandler(webapp.RequestHandler):
     
     @decorator.oauth_required
@@ -197,7 +164,7 @@ class TeacherHandler(webapp.RequestHandler):
         
         user.first_name = "Stuff2"
         user.last_name = "Thing2"
-        user.email = "thisisanemail2@whatever.com"
+        user.email = "ss12.bluteam@gmail.com"
         user.calendars = ["test text for now 2"]
         
         user2 = student.Student(student_db)
@@ -207,11 +174,8 @@ class TeacherHandler(webapp.RequestHandler):
         user2.email = "bardia.keyvani@gmail.com"
         user2.calendars = ["test text for now"]
         
-        # user.createCalendar(user2)
-        
         http = decorator.http()
         
-        # description = student.first_name + "Study Planner"
         calendar = {
                     "kind": "calendar#calendar",
                     "summary": 'student',
@@ -221,19 +185,18 @@ class TeacherHandler(webapp.RequestHandler):
                     }
     
         created_calendar = service.calendars().insert(body=calendar).execute(http=http)
+        etag = created_calendar['etag']
+        id = created_calendar['id']
         user2.calendars.append(created_calendar['id'])
-        rule = {
-                "kind": "calendar#aclRule",
-              
-                "id": created_calendar['id'],
-                    "scope": {
-                              "type": "user",
-                              "value": user2.email
-                              },
-                "role": "reader"
-                }
-        # print "hello"
-        created_rule = service.acl().insert(calendarId=created_calendar['id'], body=rule).execute(http=http)
+        # rule = {
+        #        "role": "reader",
+        #        "id": "nvp4tmo5310cem6f362em7sbp0@group.calendar.google.com",
+        #        "scope": {
+        #                      "type": "user",
+        #                      "value": "bardia.keyvani@gmail.com"
+        #                },
+        #        }
+        # created_rule = service.acl().insert(calendarId='nvp4tmo5310cem6f362em7sbp0@group.calendar.google.com', body=rule).execute(http=http)
 
         template_values = {
         }
@@ -270,6 +233,8 @@ class CreateCalHandler(webapp.RequestHandler):
         self.response.out.write("<html><p>Hello World!</p></html>")
 
 def main():
+    
+    
   application = webapp.WSGIApplication(
       [
        ('/', MainHandler),
