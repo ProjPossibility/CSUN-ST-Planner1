@@ -24,19 +24,19 @@
         </div>
         <div id="right">
         	<h3>Create Student/Calendar</h3>
-        		<form action="/student" method="post">
+        		<form action="/createcal" method="post">
         			<input type="email" value = "Email" name="email" /> <br>
         			<input type="text" value="First Name" name="first"/><br>
         			<input type="text" value="Last Name" name="last" /></br>
         			<button type="submit">Create Student</button><br>
         		</form>
         	<h3>Add Event</h3>
-        	<form>
-        			<input type="email" value="Email" id="email2"/><br>
-        			<input type="text" value="Title" id="title"/><br>
-        			<input type="text" value="Description" id="description" /><br>
+        	<form action="/event">
+        			<input type="email" value="Email" name="email"/><br>
+        			<input type="text" value="Title" name="title"/><br>
+        			<input type="text" value="Description" name="description" /><br>
         			<p>Start Time</p><br>
-        			<input type="text" value="yyyy-mm-dd" id="startTime" /><br>
+        			<input type="text" value="yyyy-mm-dd" name="starttime" /><br>
         			<button type="submit">Create Event</button><br>
         		</form>
         </div>

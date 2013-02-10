@@ -19,29 +19,49 @@ class Greeting(db.Model):
   date = db.DateTimeProperty(auto_now_add=True)
 
 class Student(db.Model):
-    email = db.StringProperty();
-    first = db.StringProperty();
-    last = db.StringProperty();
-   # calendarID = db.StringProperty();
-    #type = db.StringProperty();
+    email = db.StringProperty()
+    first = db.StringProperty()
+    last = db.StringProperty()
+    calendarID = db.StringProperty()
+    type = db.StringProperty()
     
-
-def guestbook_key(guestbook_name=None):
-  """Constructs a Datastore key for a Guestbook entity with guestbook_name."""
-  return db.Key.from_path('Guestbook', guestbook_name or 'default_guestbook')
+class Teacher(db.Model):
+    email = db.StringProperty()
+    first = db.StringProperty()
+    last = db.StringProperty()
+    calendarID = db.StringProperty()
+    type = db.StringProperty()
 
 def student_key(student_name=None):
   """Constructs a Datastore key for a Guestbook entity with guestbook_name."""
   return db.Key.from_path('Student', student_name or 'default_student')
 
+def teacher_key(teacher_name=None):
+  """Constructs a Datastore key for a Guestbook entity with guestbook_name."""
+  return db.Key.from_path('Teacher', teacher_name or 'default_teacher')
+
 class MainPage(webapp2.RequestHandler):
     def get(self):
+        user = users.get_current_user()
+        
+        if user:
+                teacher_name = self.request.get('teacher_name')
+        
+                check = db.GqlQuery("SELECT * FROM Teacher WHERE email = '" + user.nickname() + "'" ,
+                teacher_key(teacher_name))        
+                if check:
+                    self.redirect('/teacher')
+                else:
+                    self.redirect('/student')
+        else:
+            self.redirect(users.create_login_url(self.request.uri))
+        
+        
+        
+        
+class TeacherHandler(webapp2.RequestHandler):
+    def get(self):
         teacher_name = self.request.get('teacher_name')
-        guestbook_name=self.request.get('guestbook_name')
-        greetings_query = Greeting.all().ancestor(
-            guestbook_key(guestbook_name)).order('-date')
-        greetings = greetings_query.fetch(10)
-
         if users.get_current_user():
             url = users.create_logout_url(self.request.uri)
             url_linktext = 'Logout'
@@ -50,9 +70,6 @@ class MainPage(webapp2.RequestHandler):
             url_linktext = 'Login'
 
         template_values = {
-            'greetings': greetings,
-            'url': url,
-            'url_linktext': url_linktext,
         }
 
         template = jinja_environment.get_template('teacher.html')
@@ -90,6 +107,7 @@ class CreateCal(webapp2.RequestHandler):
     student.email = self.request.get('email')
     student.first = self.request.get('first')
     student.last = self.request.get('last')
+    student.type = "student"
     student.put()
     self.response.write(student.email);
     #self.redirect('/?' + urllib.urlencode({'student_name': student_name}))
@@ -98,5 +116,6 @@ class CreateCal(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/sign', Guestbook),
-                               ('/student', CreateCal)],
+                               ('/teacher', TeacherHandler),
+                               ('/createcal', CreateCal)],
                               debug=True)
