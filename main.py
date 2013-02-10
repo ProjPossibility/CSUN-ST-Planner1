@@ -92,23 +92,12 @@ class MainHandler(webapp.RequestHandler):
     # request = service.events().list(calendarId='primary')
     # response = request.execute(http=http)
     
-    student_db = db.Key.from_path('Data', 'student_table')
+    student = False
     
-    user = student.Student(student_db)
-    
-    user.first_name = "Stuff"
-    user.last_name = "Thing"
-    user.email = "thisisanemail@whatever.com"
-    user.calendars = ["test text for now"]
-    
-    user.put()
-    
-    template_values = {'first': user.first, 
-                       'last': user.last, 
-                       'calendars': user.calendars}
-    
-    path = os.path.join(os.path.dirname(__file__), 'student.html')
-    self.response.out.write(template.render(path, template_values))
+    if student:
+        self.redirect("/student")
+    else:
+        self.redirect("/teacher")
     
     # self.response.out.write("<html>")
     # Parse every item
@@ -117,11 +106,72 @@ class MainHandler(webapp.RequestHandler):
     
     # self.response.out.write("</html>")
     
+class StudentHandler(webapp.RequestHandler):
+    
+    @decorator.oauth_required
+    def get(self):
+        student_db = db.Key.from_path('Data', 'student_table')
         
+        user = student.Student(student_db)
+        
+        user.first_name = "Stuff"
+        user.last_name = "Thing"
+        user.email = "thisisanemail@whatever.com"
+        user.calendars = ["test text for now"]
+        
+        user.put()
+        
+        template_values = {'first': user.first_name, 
+                           'last': user.last_name, 
+                           'calendars': user.calendars}
+        
+        path = os.path.join(os.path.dirname(__file__), 'student.html')
+        self.response.out.write(template.render(path, template_values))
+        
+class Teacher(db.Model):
+    first_name = db.StringProperty()
+    last_name = db.StringProperty()
+    email = db.StringProperty()
+    calendars = db.StringListProperty()        
+        
+class TeacherHandler(webapp.RequestHandler):
+    
+    @decorator.oauth_required
+    def get(self):
+        teacher_db = db.Key.from_path('Data', 'teacher_table')
+        
+        user = Teacher(teacher_db)
+        
+        user.first_name = "Stuff2"
+        user.last_name = "Thing2"
+        user.email = "thisisanemail2@whatever.com"
+        user.calendars = ["test text for now 2"]
+        
+        user.put()
+        
+        template_values = {}
+        
+        path = os.path.join(os.path.dirname(__file__), 'teacher.html')
+        self.response.out.write(template.render(path, template_values))
+        
+class EventHandler(webapp.RequestHandler):
+    
+    def get(self):
+        self.response.out.write("<html><p>Hello World!</p></html>")
+        
+class CreateCalHandler(webapp.RequestHandler):
+    
+    def get(self):
+        self.response.out.write("<html><p>Hello World!</p></html>")
+
 def main():
   application = webapp.WSGIApplication(
       [
        ('/', MainHandler),
+       ('/student', StudentHandler),
+       ('/teacher', TeacherHandler),
+       ('/event', EventHandler),
+       ('/createcal', CreateCalHandler),
        (decorator.callback_path, decorator.callback_handler()),
       ],
       debug=True)
