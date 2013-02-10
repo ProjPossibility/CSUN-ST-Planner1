@@ -28,6 +28,7 @@ import json
 import logging
 import os
 import pickle
+import apiclient
 
 import student
 
@@ -35,7 +36,7 @@ from apiclient.discovery import build
 from oauth2client.appengine import oauth2decorator_from_clientsecrets
 from oauth2client.client import AccessTokenRefreshError
 from google.appengine.api import memcache
-# from google.appengine.api import users
+from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext import db
 from google.appengine.ext.webapp import template
@@ -92,12 +93,19 @@ class MainHandler(webapp.RequestHandler):
     # request = service.events().list(calendarId='primary')
     # response = request.execute(http=http)
     
-    student = False
+    user = users.get_current_user()
     
-    if student:
-        self.redirect("/student")
+    if user:
+            teacher_name = self.request.get('teacher_name')
+    
+            check = db.GqlQuery("SELECT * FROM Teacher WHERE email = '" + user.nickname() + "'" ,
+                                db.Key.from_path('Data', 'teacher_table'))        
+            if check:
+                self.redirect('/teacher')
+            else:
+                self.redirect('/student')
     else:
-        self.redirect("/teacher")
+        self.redirect(users.create_login_url(self.request.uri))
     
     # self.response.out.write("<html>")
     # Parse every item
@@ -128,17 +136,112 @@ class StudentHandler(webapp.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), 'student.html')
         self.response.out.write(template.render(path, template_values))
         
-class Teacher(db.Model):
-    first_name = db.StringProperty()
-    last_name = db.StringProperty()
-    email = db.StringProperty()
-    calendars = db.StringListProperty()        
+class Teacher(db.Model, webapp.RequestHandler):
+    def __init__(self, req=None, resp=None):
+        self.initialize(req, resp)
+        self.first_name = db.StringProperty()
+        self.last_name = db.StringProperty()
+        self.email = db.StringProperty()
+        self.calendars = db.StringListProperty()
+    
+    """@decorator.oauth_required
+    def createCalendar(self, student):
+        http = decorator.http()
         
+        # description = student.first_name + "Study Planner"
+        calendar = {
+                    "kind": "calendar#calendar",
+                    "summary": 'student',
+                    "description": "student planner",
+                    "location": "Los Angeles",
+                    "timeZone": 'America/Los_Angeles'
+                    }
+    
+        created_calendar = service.calendars().insert(body=calendar).execute(http=http)
+        student.courses.append[created_calender['id']]
+        rule = {
+                "kind": "calendar#aclRule",
+              
+                "id": created_calendar['id'],
+                    "scope": {
+                              "type": "user",
+                              "value": student.email
+                              },
+                "role": reader
+                }
+        # print "hello"
+        created_rule = service.acl().insert(calendarId=created_calendar['id'], body=rule).execute(http=http)
+        # with open("log", "w") as f:
+        #    f.write(created_rule)
+        #    f.close()
+            
+        # return " <h2> we did it</h2>"        
+        """
 class TeacherHandler(webapp.RequestHandler):
     
     @decorator.oauth_required
     def get(self):
+        teacher_name = self.request.get('teacher_name')
+        if users.get_current_user():
+            url = users.create_logout_url(self.request.uri)
+            url_linktext = 'Logout'
+        else:
+            url = users.create_login_url(self.request.uri)
+            url_linktext = 'Login'
+
+        student_db = db.Key.from_path('Data', 'student_table')
         teacher_db = db.Key.from_path('Data', 'teacher_table')
+        
+        
+        user = Teacher()
+        
+        user.first_name = "Stuff2"
+        user.last_name = "Thing2"
+        user.email = "thisisanemail2@whatever.com"
+        user.calendars = ["test text for now 2"]
+        
+        user2 = student.Student(student_db)
+        
+        user2.first_name = "Stuff"
+        user2.last_name = "Thing"
+        user2.email = "bardia.keyvani@gmail.com"
+        user2.calendars = ["test text for now"]
+        
+        # user.createCalendar(user2)
+        
+        http = decorator.http()
+        
+        # description = student.first_name + "Study Planner"
+        calendar = {
+                    "kind": "calendar#calendar",
+                    "summary": 'student',
+                    "description": "student planner",
+                    "location": "Los Angeles",
+                    "timeZone": 'America/Los_Angeles'
+                    }
+    
+        created_calendar = service.calendars().insert(body=calendar).execute(http=http)
+        user2.calendars.append(created_calendar['id'])
+        rule = {
+                "kind": "calendar#aclRule",
+              
+                "id": created_calendar['id'],
+                    "scope": {
+                              "type": "user",
+                              "value": user2.email
+                              },
+                "role": "reader"
+                }
+        # print "hello"
+        created_rule = service.acl().insert(calendarId=created_calendar['id'], body=rule).execute(http=http)
+
+        template_values = {
+        }
+
+        path = os.path.join(os.path.dirname(__file__), 'teacher.html')
+        self.response.out.write(template.render(path, template_values))
+        
+        """teacher_db = db.Key.from_path('Data', 'teacher_table')
         
         user = Teacher(teacher_db)
         
@@ -154,7 +257,7 @@ class TeacherHandler(webapp.RequestHandler):
                            'calendars': user.calendars}
 
         path = os.path.join(os.path.dirname(__file__), 'teacher.html')
-        self.response.out.write(template.render(path, template_values))
+        self.response.out.write(template.render(path, template_values))"""
         
 class EventHandler(webapp.RequestHandler):
     
