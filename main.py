@@ -198,29 +198,10 @@ class TeacherHandler(webapp.RequestHandler):
         #        }
         # created_rule = service.acl().insert(calendarId='nvp4tmo5310cem6f362em7sbp0@group.calendar.google.com', body=rule).execute(http=http)
 
-        template_values = {
-        }
+        template_values = {}
 
         path = os.path.join(os.path.dirname(__file__), 'teacher.html')
         self.response.out.write(template.render(path, template_values))
-        
-        """teacher_db = db.Key.from_path('Data', 'teacher_table')
-        
-        user = Teacher(teacher_db)
-        
-        user.first_name = "Stuff2"
-        user.last_name = "Thing2"
-        user.email = "thisisanemail2@whatever.com"
-        user.calendars = ["test text for now 2"]
-        
-        user.put()
-        
-        template_values = {'first': user.first_name, 
-                           'last': user.last_name, 
-                           'calendars': user.calendars}
-
-        path = os.path.join(os.path.dirname(__file__), 'teacher.html')
-        self.response.out.write(template.render(path, template_values))"""
         
 class EventHandler(webapp.RequestHandler):
     
