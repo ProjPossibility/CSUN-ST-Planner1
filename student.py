@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
-class Student:
-    def __init__(self):
-        first_name = ""
-        last_name = ""
-        email = ""
-        calendars = []
+from google.appengine.ext import db
+
+class Student(db.Model):
+    first_name = db.StringProperty()
+    last_name = db.StringProperty()
+    email = db.StringProperty()
+    calendars = db.StringListProperty()
         
     

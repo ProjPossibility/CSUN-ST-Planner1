@@ -37,6 +37,7 @@ from oauth2client.client import AccessTokenRefreshError
 from google.appengine.api import memcache
 # from google.appengine.api import users
 from google.appengine.ext import webapp
+from google.appengine.ext import db
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 
@@ -91,12 +92,16 @@ class MainHandler(webapp.RequestHandler):
     # request = service.events().list(calendarId='primary')
     # response = request.execute(http=http)
     
-    user = student.Student()
+    student_db = db.Key.from_path('Data', 'student_table')
     
-    user.first = "Stuff"
-    user.last = "Thing"
+    user = student.Student(student_db)
+    
+    user.first_name = "Stuff"
+    user.last_name = "Thing"
     user.email = "thisisanemail@whatever.com"
     user.calendars = ["test text for now"]
+    
+    user.put()
     
     template_values = {'first': user.first, 
                        'last': user.last, 
