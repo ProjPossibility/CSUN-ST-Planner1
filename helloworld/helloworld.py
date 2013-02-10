@@ -47,9 +47,8 @@ class MainPage(webapp2.RequestHandler):
         if user:
                 teacher_name = self.request.get('teacher_name')
         
-                check = db.GqlQuery("SELECT * FROM Teacher WHERE email = '" + user.nickname() + "'" ,
-                teacher_key(teacher_name))        
-                if check:
+                check = db.GqlQuery("SELECT * FROM Teacher WHERE email = '" + user.nickname() + "'")        
+                if check.get() != None:
                     self.redirect('/teacher')
                 else:
                     self.redirect('/student')
@@ -74,23 +73,23 @@ class TeacherHandler(webapp2.RequestHandler):
 
         template = jinja_environment.get_template('teacher.html')
         self.response.out.write(template.render(template_values))
+        
+class StudentHandler(webapp2.RequestHandler):
+    def get(self):
+        student_name = self.request.get('student_name')
+        if users.get_current_user():
+            url = users.create_logout_url(self.request.uri)
+            url_linktext = 'Logout'
+        else:
+            url = users.create_login_url(self.request.uri)
+            url_linktext = 'Login'
 
+        template_values = {
+        }
 
-class Guestbook(webapp2.RequestHandler):
-  def post(self):
-    # We set the same parent key on the 'Greeting' to ensure each greeting is in
-    # the same entity group. Queries across the single entity group will be
-    # consistent. However, the write rate to a single entity group should
-    # be limited to ~1/second.
-    guestbook_name = self.request.get('guestbook_name')
-    greeting = Greeting(parent=guestbook_key(guestbook_name))
+        template = jinja_environment.get_template('student.html')
+        self.response.out.write(template.render(template_values))
 
-    if users.get_current_user():
-      greeting.author = users.get_current_user().nickname()
-
-    greeting.content = self.request.get('content')
-    greeting.put()
-    self.redirect('/?' + urllib.urlencode({'guestbook_name': guestbook_name}))
 
 class CreateCal(webapp2.RequestHandler):
   def post(self):
@@ -115,7 +114,7 @@ class CreateCal(webapp2.RequestHandler):
 
 
 app = webapp2.WSGIApplication([('/', MainPage),
-                               ('/sign', Guestbook),
                                ('/teacher', TeacherHandler),
+                               ('/student', StudentHandler),
                                ('/createcal', CreateCal)],
                               debug=True)
