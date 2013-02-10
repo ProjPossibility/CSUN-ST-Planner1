@@ -29,11 +29,13 @@ import logging
 import os
 import pickle
 
+import student
+
 from apiclient.discovery import build
 from oauth2client.appengine import oauth2decorator_from_clientsecrets
 from oauth2client.client import AccessTokenRefreshError
 from google.appengine.api import memcache
-from google.appengine.api import users
+# from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
@@ -85,11 +87,29 @@ class MainHandler(webapp.RequestHandler):
     # Get the authorized Http object created by the decorator.
     http = decorator.http()
     # Call the service using the authorized Http object.
-    request = service.events().list(calendarId='primary')
-    response = request.execute(http=http)
+    # request = service.events().list(calendarId='primary')
+    # response = request.execute(http=http)
     
-    self.response.out.write("<html><p>" + json.dumps(response, sort_keys=True, 
-                                                     indent=4) + "</p></html")
+    user = student.Student()
+    
+    user.first = "Stuff"
+    user.last = "Thing"
+    user.email = "thisisanemail@whatever.com"
+    user.courses = {"Test Course" : "primary"}
+    
+    template_values = {'first': user.first, 
+                       'last': user.last, 
+                       'courses': user.courses}
+    
+    path = os.path.join(os.path.dirname(__file__), 'index.html')
+    self.response.out.write(template.render(path, template_values))
+    
+    # self.response.out.write("<html>")
+    # Parse every item
+    # for event in response["items"]:
+    #    self.response.out.write("<p>" + event["summary"] + "</p>")
+    
+    # self.response.out.write("</html>")
     
         
 def main():

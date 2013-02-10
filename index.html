@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>
+        	{{first}} {{last}}
+        </title>
+    </head>
+    <body>
+		<div id=site>
+		<div id="top">
+			<span id="name">{{first}} {{last}}</span>
+		</div>
+        <div id="courses"> 
+        	<h3>Courses</h3>
+        	<table>
+        		{% for course in courses.keys %}
+        		<tr>
+        			<p>{{course}}</p>
+        		</tr>
+        		{% endfor %}
+        	</table>	
+        </div>
+        <div id="right"> 
+        	<iframe src="https://www.google.com/calendar/embed?showTitle=0&amp;height=600&amp;wkst=1&amp;bgcolor=%23FFFFFF&amp;src=ss12.blueteam%40gmail.com&amp;color=%23691426&amp;ctz=America%2FLos_Angeles" style=" border-width:0 " width="800" height="600" frameborder="0" scrolling="no"> </iframe>
+        </div>
+        </div>
+        </body>
+</html>
+<style type="text/css">
+	#site{
+		width: 1280px;
+		height: 1080px
+		background-color: white;	
+		margin:auto;
+	}
+	#courses{
+		width:15%;
+		float: left;
+	}
+	#top{
+		height:50px;
+		width:100px;	
+	}
+	#calendar{
+		float:right;
+		width:85%;	
+	}
+</style>
