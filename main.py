@@ -101,7 +101,7 @@ class MainHandler(webapp.RequestHandler):
                        'last': user.last, 
                        'courses': user.courses}
     
-    path = os.path.join(os.path.dirname(__file__), 'index.html')
+    path = os.path.join(os.path.dirname(__file__), 'student.html')
     self.response.out.write(template.render(path, template_values))
     
     # self.response.out.write("<html>")
