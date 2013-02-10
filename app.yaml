@@ -2,8 +2,8 @@ application: ss12stplanner
 version: 2
 runtime: python27
 api_version: 1
+threadsafe: no
 
 handlers:
 - url: .*
   script: main.py
-

@@ -84,6 +84,7 @@ class MainHandler(webapp.RequestHandler):
 
   @decorator.oauth_required
   def get(self):
+    # self.response.out.write("<html><p>Hello world!</p><html>")
     # Get the authorized Http object created by the decorator.
     http = decorator.http()
     # Call the service using the authorized Http object.
